@@ -14,14 +14,14 @@ def generate_launch_description():
     pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
     pkg_testbed_gazebo = get_package_share_directory('testbed_gazebo')
 
-    # We get the whole install dir
-    # We do this to avoid having to copy or softlink manually the packages so that gazebo can find them
+    # grabbing the install dir for testbed_description
+    # this way i don't have to manually symlink/copy the package for gazebo to find it
     description_package_name = "testbed_description"
     install_dir = get_package_prefix(description_package_name)
 
-    # Set the path to the WORLD model files - Used to find the models inside the models folder in testbed_gazebo package
+    # need this so gazebo knows where to look for our custom models (the models folder in testbed_gazebo)
     gazebo_models_path = os.path.join(pkg_testbed_gazebo, 'models')
-    # os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
+    # os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path  (old way, not using this line anymore)
 
     if 'GAZEBO_MODEL_PATH' in os.environ:
         os.environ['GAZEBO_MODEL_PATH'] =  os.environ['GAZEBO_MODEL_PATH'] + ':' + install_dir + '/share' + ':' + gazebo_models_path
@@ -36,7 +36,7 @@ def generate_launch_description():
     print("GAZEBO MODELS PATH=="+str(os.environ["GAZEBO_MODEL_PATH"]))
     print("GAZEBO PLUGINS PATH=="+str(os.environ["GAZEBO_PLUGIN_PATH"]))
 
-    # Gazebo launch
+    # bringing up the actual gazebo simulator
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_gazebo_ros, 'launch', 'gazebo.launch.py'),
