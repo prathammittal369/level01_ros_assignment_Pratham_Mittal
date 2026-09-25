@@ -4,18 +4,18 @@ from launch import LaunchDescription
 from launch.substitutions import Command
 from launch_ros.actions import Node
 
-# this is the function launch the system will look for
+# entry point function, ros2 launch calls this for us
 def generate_launch_description():
 
-    ####### DATA INPUT ##########
+    # ---- basic settings for this launch file ----
     urdf_file = 'testbed.xacro'
     package_description = "testbed_description"
 
-    print("Fetching URDF ==>")
+    print("Fetching URDF ==>")  # just a print so i can see it's actually finding the file when i run it
     robot_desc_path = os.path.join(
         get_package_share_directory(package_description), "urdf", urdf_file)
 
-    #ROBOT STATE PUBLISHER
+    # this node publishes the robot's tf tree from the urdf/xacro
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -26,17 +26,18 @@ def generate_launch_description():
         output="screen"
     )
 
-    #JOINT STATE PUBLISHER
+    # publishes joint states so we can see the wheels etc move in rviz
     joint_state_controller_node = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher'
             # parameters=[
             #     {'use_sim_time': LaunchConfiguration('use_sim_time')}
-            # ] #since galactic use_sim_time gets passed somewhere and rejects this when defined from launch file
+            # ] # left this commented out - tried adding use_sim_time here but it kept
+              # erroring out (something about it being set twice), so skipping it for now
     )
     
-    #RVIZ CONFIGURATION
+    # path to the rviz config so it opens with the right displays already set up
     rviz_config_dir = os.path.join(
         get_package_share_directory(package_description),
         'rviz',
@@ -50,7 +51,7 @@ def generate_launch_description():
             arguments=['-d', rviz_config_dir]
     )
 
-    # create and return launch description object
+    # bundle everything up and hand it back to ros2 launch
     return LaunchDescription([            
             robot_state_publisher_node,
             joint_state_controller_node,

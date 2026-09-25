@@ -6,22 +6,24 @@ from launch_ros.actions import Node
 from launch import LaunchDescription
 
 
-# this is the function launch  system will look for
+# ros2 launch looks for this function automatically, learned that the hard way lol
 def generate_launch_description():
 
 
-    # Position and orientation
-    # [X, Y, Z]
+    # where i want the robot to spawn in the world
+    # order is x, y, z
     position = [0.0, 5.0, 0.0]
-    # [Roll, Pitch, Yaw]
+    # and this is roll, pitch, yaw (radians i think, not 100% sure)
     orientation = [0.0, 0.0, 0.0]
-    # Base Name or robot
+    # just naming the robot entity here
     robot_base_name = "testbed"
 
 
     entity_name = robot_base_name#+"-"+str(int(random.random()*100000))
+    # ^ was going to add a random suffix so i could spawn multiple robots
+    # but didn't need it for this assignment, leaving it commented for now
 
-    # Spawn ROBOT Set Gazebo
+    # this node actually spawns the robot into gazebo using the urdf on /robot_description
     spawn_robot = Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
@@ -39,7 +41,7 @@ def generate_launch_description():
 
  
 
-    # create and return launch description object
+    # gotta return a LaunchDescription with all the nodes/actions in it
     return LaunchDescription(
         [
             spawn_robot,
